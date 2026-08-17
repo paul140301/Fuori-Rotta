@@ -441,7 +441,7 @@ select:focus, input:focus, textarea:focus { outline: 2px solid var(--rust); outl
 /* Schermi molto larghi: l'itinerario passa a due colonne, con il
    risultato del percorso "agganciato" mentre si scorre l'elenco tappe. */
 @media (min-width: 1200px) {
-  #view-itinerary {
+  #view-itinerary:not(.hidden) {
     max-width: 1100px;
     margin: 0 auto;
     display: grid;
