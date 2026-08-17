@@ -499,12 +499,13 @@ async function init() {
   document.getElementById("itinSpeed").value = settings.travelSpeedKmh;
   syncNotifyChip();
 
-  document.querySelectorAll(".nav-btn").forEach((btn) => {
+  document.querySelectorAll(".nav-btn[data-view]").forEach((btn) => {
     btn.addEventListener("click", () => switchView(btn.dataset.view));
   });
 
   document.getElementById("fabAdd").addEventListener("click", () => openPlaceModal(null));
   document.getElementById("btnSettings").addEventListener("click", openSettingsModal);
+  document.getElementById("btnSettingsSidebar").addEventListener("click", openSettingsModal);
   document.querySelectorAll(".modal-close").forEach((b) => b.addEventListener("click", closeModals));
   document.querySelector(".modal-backdrop").addEventListener("click", closeModals);
 

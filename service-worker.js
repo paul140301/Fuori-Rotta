@@ -1,5 +1,5 @@
-const SHELL_CACHE = "fr-shell-v4";
-const RUNTIME_CACHE = "fr-runtime-v4";
+const SHELL_CACHE = "fr-shell-v5";
+const RUNTIME_CACHE = "fr-runtime-v5";
 
 const SHELL_FILES = [
   "./",
