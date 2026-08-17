@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>Fuori Rotta — Urbex Companion</title>
+<meta name="description" content="Radar, schedario e pianificatore di uscite per l'esplorazione urbana." />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#12151a" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="authGate" class="auth-gate hidden">
+  <div class="auth-card">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <h2 id="authTitle">Accedi</h2>
+    <p class="hint">Stessa email e password su PC, iPad e iPhone: i tuoi luoghi restano sincronizzati su tutti e tre.</p>
+    <form id="authForm">
+      <input id="authEmail" type="email" placeholder="tuo@indirizzo.it" required autocomplete="email" />
+      <input id="authPassword" type="password" placeholder="Password (min. 6 caratteri)" minlength="6" required autocomplete="current-password" />
+      <button id="authSubmit" type="submit" class="btn-primary wide">Accedi</button>
+    </form>
+    <button id="authToggleMode" class="chip-btn" type="button">Non hai un account? Registrati</button>
+    <p id="authStatus" class="hint"></p>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <div class="brand-text">
+      <h1>Fuori Rotta</h1>
+      <p id="statusLine" class="brand-sub">In attesa di posizione…</p>
+    </div>
+  </div>
+  <button id="btnSettings" class="icon-btn" aria-label="Impostazioni">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6a.5.5 0 0 0 .1-.6l-2-3.5a.5.5 0 0 0-.6-.2l-2.5 1a7.7 7.7 0 0 0-1.7-1L14.4 2a.5.5 0 0 0-.5-.4h-4a.5.5 0 0 0-.5.4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.2l-2 3.5a.5.5 0 0 0 .1.6L4.4 11a7.6 7.6 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.1.6l2 3.5a.5.5 0 0 0 .6.2l2.5-1c.5.4 1.1.8 1.7 1l.4 2.7a.5.5 0 0 0 .5.4h4a.5.5 0 0 0 .5-.4l.4-2.7c.6-.2 1.2-.6 1.7-1l2.5 1a.5.5 0 0 0 .6-.2l2-3.5a.5.5 0 0 0-.1-.6L19.4 13Zm-7.4 2.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/></svg>
+  </button>
+</header>
+
+<main id="views">
+
+  <!-- RADAR -->
+  <section id="view-radar" class="view">
+    <div class="view-head">
+      <p class="eyebrow">01 — Rilevamento</p>
+      <h2>Nei dintorni</h2>
+    </div>
+    <div id="radarContainer" class="radar-wrap"></div>
+    <div class="radar-legend">
+      <label class="radius-label">Raggio d'allarme
+        <select id="radiusSelect">
+          <option value="5">5 km</option>
+          <option value="10" selected>10 km</option>
+          <option value="20">20 km</option>
+          <option value="50">50 km</option>
+        </select>
+      </label>
+      <button id="btnNotifyToggle" class="chip-btn">🔕 Notifiche disattivate</button>
+    </div>
+    <ul id="nearbyList" class="nearby-list"></ul>
+  </section>
+
+  <!-- MAP -->
+  <section id="view-map" class="view hidden">
+    <div id="mapEl" class="map-el"></div>
+  </section>
+
+  <!-- PLACES -->
+  <section id="view-places" class="view hidden">
+    <div class="view-head">
+      <p class="eyebrow">03 — Schedario</p>
+      <h2>Luoghi</h2>
+    </div>
+    <div class="places-toolbar">
+      <input id="searchInput" type="search" placeholder="Cerca per nome, nota, tag…" />
+      <select id="filterCategory"><option value="">Tutte le categorie</option></select>
+      <select id="filterStatus">
+        <option value="">Tutti</option>
+        <option value="visited">Già visitati</option>
+        <option value="unvisited">Da visitare</option>
+      </select>
+    </div>
+    <div id="placesCount" class="places-count"></div>
+    <ul id="placesList" class="places-list"></ul>
+  </section>
+
+  <!-- ITINERARY -->
+  <section id="view-itinerary" class="view hidden">
+    <div class="view-head">
+      <p class="eyebrow">04 — Pianificazione</p>
+      <h2>Itinerario</h2>
+    </div>
+    <div class="itin-config">
+      <label>Partenza
+        <select id="itinStart">
+          <option value="gps">Posizione attuale</option>
+          <option value="home">Casa (impostazioni)</option>
+        </select>
+      </label>
+      <label>Velocità media
+        <input id="itinSpeed" type="number" min="10" max="130" step="5" value="45" /> km/h
+      </label>
+    </div>
+    <div class="itin-picker">
+      <div class="itin-picker-head">
+        <p class="eyebrow">Scegli le tappe</p>
+        <button id="btnSuggestNearby" class="chip-btn">✨ Suggerisci vicini</button>
+      </div>
+      <ul id="itinCandidates" class="itin-candidates"></ul>
+    </div>
+    <button id="btnGenerateItin" class="btn-primary wide">Genera itinerario</button>
+    <div id="itinResult" class="itin-result"></div>
+  </section>
+
+</main>
+
+<nav class="bottomnav">
+  <button class="nav-btn active" data-view="view-radar">
+    <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>
+    <span>Radar</span>
+  </button>
+  <button class="nav-btn" data-view="view-map">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path fill="none" stroke="currentColor" stroke-width="1.6" d="M9 4v14M15 6v14"/></svg>
+    <span>Mappa</span>
+  </button>
+  <button class="nav-btn" data-view="view-places">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M4 6h16M4 12h16M4 18h10"/></svg>
+    <span>Luoghi</span>
+  </button>
+  <button class="nav-btn" data-view="view-itinerary">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="none" stroke="currentColor" stroke-width="1.6" d="M4 19c3-6 4-9 8-9s2 6 6 6"/><circle cx="4" cy="19" r="1.6" fill="currentColor"/><circle cx="18" cy="16" r="1.6" fill="currentColor"/></svg>
+    <span>Itinerario</span>
+  </button>
+</nav>
+
+<button id="fabAdd" class="fab" aria-label="Aggiungi luogo">+</button>
+
+<!-- MODALS -->
+<div id="modalRoot" class="modal-root hidden">
+  <div class="modal-backdrop"></div>
+
+  <div id="modalPlace" class="modal hidden">
+    <div class="modal-head">
+      <h3 id="modalPlaceTitle">Nuovo luogo</h3>
+      <button class="icon-btn modal-close" aria-label="Chiudi">✕</button>
+    </div>
+    <div class="modal-body">
+      <label>Nome
+        <input id="fName" type="text" placeholder="Es. Ex cotonificio" />
+      </label>
+
+      <label>Coordinate
+        <div class="coord-row">
+          <input id="fLat" type="number" step="0.000001" placeholder="Lat" />
+          <input id="fLng" type="number" step="0.000001" placeholder="Lng" />
+        </div>
+      </label>
+      <label>Incolla link Google Maps o "lat, lng" (da Urbexology, ecc.)
+        <input id="fPaste" type="text" placeholder="Incolla qui per compilare le coordinate" />
+      </label>
+      <button id="btnUseGPS" type="button" class="chip-btn">📍 Usa posizione attuale</button>
+      <button id="btnOpenMaps" type="button" class="chip-btn">🗺️ Apri in Maps</button>
+
+      <label>Categoria
+        <select id="fCategory"></select>
+      </label>
+      <label>Accessibilità
+        <select id="fAccess"></select>
+      </label>
+      <label>Provenienza
+        <select id="fSource">
+          <option value="manual">Inserito a mano</option>
+          <option value="google">Google Maps (lista Urbex)</option>
+          <option value="urbexology">Urbexology</option>
+        </select>
+      </label>
+      <label>Note
+        <textarea id="fNotes" rows="3" placeholder="Accessi, rischi, orari migliori, cosa fotografare…"></textarea>
+      </label>
+      <label class="checkbox-row">
+        <input id="fVisited" type="checkbox" />
+        Ci sono già stato
+      </label>
+
+      <div class="modal-actions">
+        <button id="btnDeletePlace" class="btn-danger hidden">Elimina</button>
+        <button id="btnSavePlace" class="btn-primary">Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalSettings" class="modal hidden">
+    <div class="modal-head">
+      <h3>Impostazioni &amp; dati</h3>
+      <button class="icon-btn modal-close" aria-label="Chiudi">✕</button>
+    </div>
+    <div class="modal-body">
+      <section class="settings-section">
+        <p class="eyebrow">Account</p>
+        <p class="hint" id="accountEmailHint">—</p>
+        <button id="btnSignOut" class="chip-btn">Esci</button>
+      </section>
+
+      <section class="settings-section">
+        <p class="eyebrow">Sorgenti dati</p>
+        <p class="hint">
+          Google Maps non espone un'API pubblica per leggere le tue liste salvate personali, e Urbexology non offre un export/API ufficiale: l'importazione è quindi manuale, una volta sola. I luoghi vengono salvati sul tuo account e sincronizzati tra PC, iPad e iPhone.
+        </p>
+        <div class="import-row">
+          <label class="file-btn">📂 Importa lista "Urbex" (Google Takeout, .json)
+            <input id="fileGoogleImport" type="file" accept=".json,application/json" hidden />
+          </label>
+        </div>
+        <div class="import-row">
+          <label class="file-btn">📂 Importa CSV / GeoJSON generico
+            <input id="fileGenericImport" type="file" accept=".csv,.json,application/json,text/csv" hidden />
+          </label>
+        </div>
+        <details class="howto">
+          <summary>Come esportare la lista "Urbex" da Google Maps</summary>
+          <ol>
+            <li>Vai su <strong>takeout.google.com</strong> con lo stesso account di Google Maps.</li>
+            <li>"Deseleziona tutto", poi seleziona solo <strong>Maps (Le tue attività)</strong>.</li>
+            <li>Nelle opzioni scegli di esportare i <strong>luoghi salvati</strong>: otterrai un file per ogni lista, incluso <code>Urbex.json</code>.</li>
+            <li>Carica qui quel file con "Importa lista Urbex".</li>
+          </ol>
+        </details>
+        <details class="howto">
+          <summary>Come importare da Urbexology</summary>
+          <p>Il sito non offre un export. Per ogni luogo che vuoi tracciare: apri il pin sulla mappa, copia le coordinate mostrate, poi usa "+ Aggiungi luogo" nell'app e incollale nel campo apposito. Richiede qualche secondo per luogo ma evita di violare i termini d'uso del sito.</p>
+        </details>
+      </section>
+
+      <section class="settings-section">
+        <p class="eyebrow">Rilevamento</p>
+        <label class="checkbox-row">
+          <input id="sNotify" type="checkbox" />
+          Notifiche quando entro nel raggio impostato
+        </label>
+        <p class="hint">Funziona mentre l'app è aperta (o installata in background su Android). iOS Safari non supporta il monitoraggio in background senza un server push dedicato: apri l'app quando arrivi in zona per vedere il radar aggiornato.</p>
+      </section>
+
+      <section class="settings-section">
+        <p class="eyebrow">Punto "Casa"</p>
+        <div class="coord-row">
+          <input id="sHomeLat" type="number" step="0.000001" placeholder="Lat" />
+          <input id="sHomeLng" type="number" step="0.000001" placeholder="Lng" />
+        </div>
+        <button id="btnUseGPSHome" type="button" class="chip-btn">📍 Usa posizione attuale</button>
+      </section>
+
+      <section class="settings-section">
+        <p class="eyebrow">Backup</p>
+        <div class="import-row">
+          <button id="btnExportJSON" class="chip-btn">⬇️ Esporta JSON</button>
+          <label class="file-btn">⬆️ Importa backup JSON
+            <input id="fileBackupImport" type="file" accept=".json,application/json" hidden />
+          </label>
+        </div>
+        <p class="hint" id="placesTotalHint"></p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/categories.js"></script>
+<script src="js/db.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/importer.js"></script>
+<script src="js/itinerary.js"></script>
+<script src="js/map.js"></script>
+<script src="js/radar.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+:root {
+  --void: #12151a;
+  --panel: #1b2027;
+  --panel-raised: #232a33;
+  --line: #2c3440;
+  --rust: #b8551f;
+  --rust-soft: #b8551f33;
+  --moss: #7c8a5e;
+  --caution: #d9a441;
+  --danger: #a83232;
+  --mist: #8b96a1;
+  --paper: #ece7dc;
+  --paper-dim: #b7b2a4;
+
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--void);
+  color: var(--paper);
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  position: relative;
+  background:
+    radial-gradient(circle at 85% 0%, #1c2b2666 0%, transparent 45%),
+    var(--void);
+}
+
+h1, h2, h3 { font-family: var(--font-display); margin: 0; font-weight: 700; }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  color: var(--rust);
+  margin: 0 0 4px;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(14px + var(--safe-top)) 18px 14px;
+  background: linear-gradient(180deg, var(--void) 70%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: conic-gradient(from 200deg, var(--rust), #7a3c17 40%, var(--void) 41%, var(--void) 100%);
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.brand-text h1 { font-size: 18px; letter-spacing: 0.01em; }
+.brand-sub { margin: 2px 0 0; font-family: var(--font-mono); font-size: 11.5px; color: var(--mist); }
+
+.icon-btn {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--paper);
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.icon-btn:active { background: var(--panel-raised); }
+
+/* ---------- Views ---------- */
+#views { flex: 1; overflow-y: auto; padding: 18px 18px calc(120px + var(--safe-bottom)); }
+.view.hidden { display: none; }
+.view-head { margin-bottom: 14px; }
+.view-head h2 { font-size: 24px; }
+
+/* ---------- Radar ---------- */
+.radar-wrap {
+  display: flex; justify-content: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.radar-svg { width: 100%; max-width: 340px; height: auto; }
+.radar-ring { fill: none; stroke: var(--line); stroke-width: 1; }
+.radar-axis { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 4; }
+.radar-ring-label { font-family: var(--font-mono); font-size: 8px; fill: var(--mist); }
+.radar-n { font-family: var(--font-mono); font-size: 10px; fill: var(--mist); text-anchor: middle; }
+.radar-me { fill: var(--paper); stroke: var(--rust); stroke-width: 3; }
+.radar-blip { stroke: var(--void); stroke-width: 1.5; cursor: pointer; }
+.radar-blip-edge { opacity: 0.55; }
+.radar-sweep { fill: var(--rust); opacity: 0.16; }
+.radar-sweep-group {
+  animation: sweep 5s linear infinite;
+  transform-box: view-box;
+  transform-origin: 160px 160px;
+}
+@keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .radar-sweep-group { animation: none; }
+}
+
+.radar-legend {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.radius-label {
+  font-family: var(--font-mono); font-size: 12px; color: var(--mist);
+  display: flex; align-items: center; gap: 8px;
+}
+select, input, textarea {
+  font-family: var(--font-body);
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  color: var(--paper);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+select:focus, input:focus, textarea:focus { outline: 2px solid var(--rust); outline-offset: 1px; }
+
+.chip-btn {
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  color: var(--paper);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+.chip-btn.on { background: var(--rust-soft); border-color: var(--rust); color: var(--paper); }
+
+.nearby-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.nearby-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 12px; cursor: pointer;
+}
+.nearby-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.nearby-main { flex: 1; min-width: 0; }
+.nearby-main strong { display: block; font-size: 14px; }
+.nearby-meta { font-family: var(--font-mono); font-size: 11px; color: var(--mist); }
+.nearby-dist { font-family: var(--font-mono); font-size: 13px; color: var(--rust); white-space: nowrap; }
+.empty-hint { color: var(--mist); font-size: 13px; padding: 20px 4px; text-align: center; }
+
+/* ---------- Map ---------- */
+/* z-index qui è quello che risolve il bug del modale nascosto sotto la
+   mappa: senza un valore esplicito .map-el non crea un proprio stacking
+   context, e i pannelli interni di Leaflet (marker/popup arrivano a
+   z-index 600-700) finiscono per confrontarsi direttamente con quello del
+   modale (40/41) — e vincono loro. Con z-index qui, restano confinati
+   dentro la mappa. */
+.map-el { position: absolute; inset: 0; top: calc(66px + var(--safe-top)); bottom: calc(74px + var(--safe-bottom)); z-index: 1; }
+.map-pin-dot { display: block; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--void); box-shadow: 0 0 0 2px currentColor; }
+.map-me-dot { display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); border: 3px solid var(--rust); }
+.map-draft-dot {
+  display: block; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--rust-soft); border: 2px dashed var(--rust);
+  animation: draftPulse 1.1s ease-in-out infinite;
+}
+@keyframes draftPulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.85; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+.map-popup { font-family: var(--font-body); color: #1a1a1a; font-size: 13px; }
+.leaflet-popup-content-wrapper { background: var(--panel); color: var(--paper); border-radius: 10px; }
+.leaflet-popup-content-wrapper .map-popup { color: var(--paper); }
+.leaflet-popup-tip { background: var(--panel); }
+
+/* ---------- Places ---------- */
+.places-toolbar { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.places-toolbar select { width: 100%; }
+.places-count { font-family: var(--font-mono); font-size: 11px; color: var(--mist); margin-bottom: 8px; }
+.places-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.place-card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px; cursor: pointer;
+}
+.place-card-top { display: flex; align-items: center; gap: 10px; }
+.place-card-top strong { flex: 1; font-size: 15px; }
+.badge { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 7px; border-radius: 6px; }
+.place-notes { color: var(--paper-dim); font-size: 12.5px; margin: 6px 0 0; }
+.place-card-meta { display: flex; gap: 10px; margin-top: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--mist); flex-wrap: wrap; }
+
+/* ---------- Itinerary ---------- */
+.itin-config { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.itin-config label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--mist); font-family: var(--font-mono); }
+.itin-picker { margin-bottom: 16px; }
+.itin-picker-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.itin-candidates { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 8px; background: var(--panel); }
+.itin-cand { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; }
+.itin-cand:has(input:checked) { background: var(--rust-soft); }
+.itin-cand label { flex: 1; font-size: 13.5px; display: flex; flex-direction: column; }
+.itin-cand .m { font-family: var(--font-mono); font-size: 10.5px; color: var(--mist); }
+
+.itin-result { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.itin-summary { display: flex; gap: 16px; font-family: var(--font-mono); margin-bottom: 12px; flex-wrap: wrap; }
+.itin-summary .big { font-size: 20px; color: var(--rust); font-weight: 700; display: block; }
+.itin-summary .label { font-size: 10px; color: var(--mist); text-transform: uppercase; letter-spacing: 0.08em; }
+.itin-leg { display: flex; gap: 10px; padding: 8px 0; border-top: 1px dashed var(--line); }
+.itin-leg:first-child { border-top: none; }
+.itin-leg .num { font-family: var(--font-mono); color: var(--rust); font-weight: 700; width: 22px; }
+.itin-leg .main { flex: 1; }
+.itin-leg .main strong { display: block; font-size: 14px; }
+.itin-leg .main span { font-family: var(--font-mono); font-size: 11px; color: var(--mist); }
+.btn-primary.wide { width: 100%; margin-top: 12px; }
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+  background: var(--rust); color: var(--paper); border: none;
+  border-radius: 10px; padding: 12px 18px; font-family: var(--font-display);
+  font-weight: 700; font-size: 14px; cursor: pointer;
+}
+.btn-danger {
+  background: transparent; color: var(--danger); border: 1px solid var(--danger);
+  border-radius: 10px; padding: 12px 18px; font-family: var(--font-display);
+  font-weight: 700; font-size: 14px; cursor: pointer;
+}
+
+/* ---------- Bottom nav & FAB ---------- */
+.bottomnav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  max-width: 560px; margin: 0 auto;
+  display: flex; justify-content: space-around;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+  padding: 8px 6px calc(8px + var(--safe-bottom));
+}
+.nav-btn {
+  background: none; border: none; color: var(--mist);
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-family: var(--font-mono); font-size: 10px; padding: 4px 10px;
+  cursor: pointer; border-radius: 10px;
+}
+.nav-btn.active { color: var(--rust); }
+
+.fab {
+  position: fixed; right: 18px; bottom: calc(76px + var(--safe-bottom)); z-index: 21;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: var(--rust); color: var(--paper); border: none;
+  font-size: 28px; line-height: 1; cursor: pointer;
+  box-shadow: 0 8px 20px #00000066;
+  max-width: calc(560px - 36px);
+}
+
+/* ---------- Modals ---------- */
+.modal-root.hidden { display: none; }
+.modal-root { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; }
+.modal-backdrop { position: absolute; inset: 0; background: #000000aa; }
+.modal {
+  position: relative; z-index: 41;
+  background: var(--panel); border-top: 1px solid var(--line);
+  border-radius: 18px 18px 0 0;
+  width: 100%; max-width: 560px; max-height: 88dvh;
+  display: flex; flex-direction: column;
+  animation: slideUp 0.22s ease-out;
+}
+.modal.hidden { display: none; }
+@keyframes slideUp { from { transform: translateY(24px); opacity: 0.4; } to { transform: translateY(0); opacity: 1; } }
+.modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.modal-body { padding: 16px 18px calc(24px + var(--safe-bottom)); overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.modal-body label { display: flex; flex-direction: column; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--mist); text-transform: uppercase; letter-spacing: 0.04em; }
+.checkbox-row { flex-direction: row !important; align-items: center; gap: 8px !important; text-transform: none !important; font-size: 13px !important; color: var(--paper) !important; }
+.checkbox-row input { width: 18px; height: 18px; }
+.coord-row { display: flex; gap: 8px; }
+.coord-row input { flex: 1; }
+.modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+.modal-actions .btn-primary { flex: 1; }
+
+.settings-section { border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.settings-section:first-child { border-top: none; padding-top: 0; }
+.hint { font-size: 12px; color: var(--mist); line-height: 1.5; margin: 0; }
+.import-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.file-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--panel-raised); border: 1px solid var(--line); color: var(--paper);
+  border-radius: 999px; padding: 8px 14px; font-family: var(--font-mono); font-size: 12px;
+  cursor: pointer; text-transform: none !important;
+}
+.howto { font-size: 12.5px; color: var(--paper-dim); }
+.howto summary { cursor: pointer; color: var(--paper); font-family: var(--font-mono); font-size: 12px; }
+.howto ol { padding-left: 18px; }
+
+/* ---------- Auth gate ---------- */
+.auth-gate.hidden { display: none; }
+.auth-gate {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--void);
+  padding: 24px;
+}
+.auth-card {
+  width: 100%; max-width: 360px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+  padding: 28px 24px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.auth-card h2 { margin-top: 4px; }
+.auth-card form { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.auth-card input { width: 100%; text-align: center; }
+.auth-card .hint { margin: 0; }
+.auth-card #authStatus.error { color: var(--danger); }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; top: calc(10px + var(--safe-top)); left: 50%; transform: translateX(-50%) translateY(-140%);
+  background: var(--panel-raised); border: 1px solid var(--rust); color: var(--paper);
+  padding: 10px 16px; border-radius: 10px; font-size: 13px; z-index: 60;
+  transition: transform 0.25s ease;
+  max-width: 90%;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+
+/* =====================================================================
+   Desktop (≥880px): la barra inferiore diventa una sidebar a sinistra,
+   i modali passano da bottom-sheet a dialog centrato, e le viste che non
+   sono la mappa prendono una larghezza massima leggibile. Sotto 880px
+   nulla cambia rispetto alla UI telefono.
+   ===================================================================== */
+@media (min-width: 880px) {
+  body { max-width: none; }
+
+  .topbar { margin-left: 240px; padding: 20px 32px; }
+
+  #views {
+    margin-left: 240px;
+    padding: 32px 32px 48px;
+  }
+
+  .view:not(#view-map):not(#view-itinerary) {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  #view-itinerary {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  /* ---- Sidebar (era la bottom nav) ---- */
+  .bottomnav {
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: auto;
+    width: 240px; max-width: none; margin: 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 4px;
+    padding: 28px 14px;
+    border-top: none;
+    border-right: 1px solid var(--line);
+    backdrop-filter: none;
+    background: var(--panel);
+  }
+  .nav-btn {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 11px 14px;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    border-radius: 10px;
+  }
+  .nav-btn.active { background: var(--rust-soft); }
+
+  .fab {
+    right: 32px; bottom: 32px;
+    max-width: none;
+  }
+
+  /* ---- Modali: dialog centrato invece di bottom-sheet ---- */
+  .modal-root { align-items: center; }
+  .modal {
+    border-radius: 18px;
+    max-width: 480px;
+    max-height: 82vh;
+    animation: fadeScale 0.16s ease-out;
+  }
+  @keyframes fadeScale {
+    from { opacity: 0; transform: translateY(0) scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* ---- Mappa: parte dopo la sidebar e sotto la topbar (più alta qui), non da bordo a bordo ---- */
+  .map-el { left: 240px; top: 84px; bottom: 0; }
+
+  /* ---- Schedario: griglia invece di lista impilata ---- */
+  .places-toolbar { flex-direction: row; }
+  .places-toolbar input[type="search"] { flex: 1; }
+  .places-toolbar select { width: auto; min-width: 190px; }
+  .places-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    align-items: start;
+    gap: 10px;
+  }
+
+  .radar-wrap { padding: 20px; }
+  .radar-svg { max-width: 420px; }
+
+  .itin-config { flex-direction: row; gap: 24px; }
+  .itin-config label { flex: 1; }
+}
+
+/* Schermi molto larghi: l'itinerario passa a due colonne, con il
+   risultato del percorso "agganciato" mentre si scorre l'elenco tappe. */
+@media (min-width: 1200px) {
+  #view-itinerary {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(340px, 440px) 1fr;
+    column-gap: 32px;
+    align-items: start;
+  }
+  #view-itinerary .view-head,
+  #view-itinerary .itin-config {
+    grid-column: 1 / -1;
+  }
+  #view-itinerary .itin-picker {
+    grid-column: 1;
+  }
+  #view-itinerary #btnGenerateItin {
+    grid-column: 1;
+  }
+  #view-itinerary .itin-result {
+    grid-column: 2;
+    grid-row: 2 / span 3;
+    position: sticky;
+    top: 32px;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+}
