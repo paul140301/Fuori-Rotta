@@ -1,0 +1,9 @@
+{
+  "name": "fuori-rotta-cloud",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend serverless (Vercel) + schema Supabase per Fuori Rotta — Urbex Companion",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
